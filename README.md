@@ -1,70 +1,131 @@
-# Getting Started with Create React App
+## Component communication
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+컴포넌트 간 통신하기
 
-## Available Scripts
+#### 하위 컴포넌트 변경
 
-In the project directory, you can run:
+A.jsx
 
-### `npm start`
+```jsx
+import { useState } from "react";
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+export default function A() {
+  const [value, setValue] = useState("아직 안 바뀜");
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+  return (
+    <div>
+      <B value={value} />
+      <button onClick={click}>E의 값을 바꾸기</button>
+    </div>
+  );
 
-### `npm test`
+  function click() {
+    setValue("E의 값을 변경");
+  }
+}
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+function B({ value }) {
+  // A의 value 받기
+  return (
+    <div>
+      <p>여긴 B </p>
+      {/* A의 value C에게 주기 */}
+      <C value={value} />
+    </div>
+  );
+}
 
-### `npm run build`
+function C({ value }) {
+  // B의 value 받기
+  return (
+    <div>
+      <p>여긴 C</p>
+      {/* B의 value D에게 주기 */}
+      <D value={value} />
+    </div>
+  );
+}
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+function D({ value }) {
+  // C의 value 받기
+  return (
+    <div>
+      <p>여긴 D</p>
+      {/* C의 value E에게 주기 */}
+      <E value={value} />
+    </div>
+  );
+}
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+function E({ value }) {
+  // D의 value 받기
+  return (
+    <div>
+      <p>여긴 E</p>
+      {/* 값 변경 */}
+      <h3>{value}</h3>
+    </div>
+  );
+}
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+<br>
 
-### `npm run eject`
+#### 상위 컴포넌트 변경
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+B.jsx
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```jsx
+import { useState } from "react";
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+export default function B() {
+  const [value, setValue] = useState("아직 안 바뀜");
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+  return (
+    <div>
+      <p>{value}</p>
+      <C setValue={setValue} />
+    </div>
+  );
+}
 
-## Learn More
+function C({ setValue }) {
+  return (
+    <div>
+      <p>여긴 C</p>
+      <D setValue={setValue} />
+    </div>
+  );
+}
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+function D({ setValue }) {
+  return (
+    <div>
+      <p>여긴 D</p>
+      <E setValue={setValue} />
+    </div>
+  );
+}
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+function E({ setValue }) {
+  return (
+    <div>
+      <p>여긴 E</p>
+      <F setValue={setValue} />
+    </div>
+  );
+}
 
-### Code Splitting
+function F({ setValue }) {
+  return (
+    <div>
+      <p>여긴 F</p>
+      <button onClick={click}>클릭</button>
+    </div>
+  );
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+  function click() {
+    setValue("B의 값을 변경");
+  }
+}
+```
